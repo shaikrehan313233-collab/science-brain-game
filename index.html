@@ -3,487 +3,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Quest: School Edition</title>
-
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-
+    <title>Science Quest Pro - Rehan & Naveen</title>
     <style>
-        :root {
-            --primary: #22d3ee;
-            --accent: #facc15;
-            --danger: #ef4444;
-            --bg: #0f172a;
+        :root { 
+            --primary: #00f2ff; --accent: #ffd700; --danger: #ff4d4d; 
+            --success: #00ff88; --bg: #030712; --card-bg: rgba(17, 24, 39, 0.8);
+            --neon-glow: 0 0 15px rgba(0, 242, 255, 0.5);
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { 
+            background: var(--bg); color: white; font-family: 'Inter', system-ui, sans-serif; 
+            margin: 0; display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; overflow-x: hidden;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #030712 100%);
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 242, 255, 0.2); z-index: 9999;
+            animation: scan 4s linear infinite; pointer-events: none;
+        }
+        @keyframes scan { from { top: 0%; } to { top: 100%; } }
+
+        header { 
+            width: 85%; max-width: 450px; padding: 15px 25px; 
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; border-radius: 50px;
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--neon-glow);
+        }
+
+        .container { 
+            width: 90%; max-width: 420px; background: var(--card-bg); padding: 35px 25px; 
+            border-radius: 40px; margin: 20px 0; backdrop-filter: blur(25px);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8); 
+            text-align: center; display: none; border: 1px solid rgba(0, 242, 255, 0.2);
+            position: relative; overflow: hidden;
+        }
+
+        .hero-box { position: relative; display: inline-block; margin-bottom: 30px; }
+        .hero-img {
+            font-size: 6rem; position: relative; z-index: 2;
+            filter: drop-shadow(0 0 20px var(--primary));
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        .menu-btn { 
+            width: 100%; padding: 20px; margin: 15px 0; border: none; border-radius: 20px; 
+            font-weight: 900; cursor: pointer; 
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); 
+            color: #030712; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;
+            border-bottom: 4px solid rgba(0,0,0,0.2);
+        }
+        .menu-btn:active { transform: scale(0.95); }
+
+        .lvl-btn { border-left: 5px solid transparent; text-align: left; padding-left: 30px; }
+        .lvl-btn:hover { border-left: 5px solid var(--primary); background: rgba(255,255,255,0.05); }
+
+        .timer-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 25px; }
+        #timer-bar { width: 100%; height: 100%; background: var(--primary); box-shadow: 0 0 15px var(--primary); border-radius: 10px; }
+
+        .hud-stat { 
+            background: rgba(255,255,255,0.05); padding: 12px 20px; border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; font-weight: bold;
+        }
+
+        .option-btn { 
+            width: 100%; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 22px; background: rgba(255,255,255,0.02); color: white; cursor: pointer; 
+            text-align: left; transition: 0.3s; font-size: 1rem; position: relative;
+        }
+        .option-btn:hover { background: rgba(0, 242, 255, 0.1); border-color: var(--primary); }
         
-        body {
-            background-color: var(--bg);
-            color: white;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+        .correct { background: var(--success) !important; color: #030712 !important; font-weight: bold; border: none !important; box-shadow: 0 0 20px var(--success); }
+        .wrong { background: var(--danger) !important; border: none !important; animation: rare-shake 0.4s; }
+
+        @keyframes rare-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 60% { transform: translateX(8px); } }
+
+        .lb-row { 
+            display: flex; justify-content: space-between; padding: 15px 20px; 
+            margin: 10px 0; border-radius: 20px; background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+        .rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); border: 1px solid var(--accent); }
 
-        header {
-            width: 100%;
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            text-align: center;
-            border-bottom: 3px solid var(--primary);
-            box-shadow: 0 4px 20px rgba(34, 211, 238, 0.2);
-        }
+        footer { margin-top: auto; padding: 30px; font-size: 0.8rem; color: #4b5563; text-transform: uppercase; letter-spacing: 3px; }
 
-        .container {
-            width: 90%;
-            max-width: 500px;
-            margin-top: 20px;
-            background: #1e293b;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        #start-screen {
-            text-align: center;
-            border: 2px solid var(--primary);
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            overflow: hidden;
-        }
-
-        .hero-icon {
-            font-size: 5rem;
-            margin-bottom: 10px;
-            display: inline-block;
-            animation: float 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 15px var(--primary));
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-        }
-
-        .pulse-text {
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 800;
-            margin-top: 0;
-        }
-
-        .mission-box {
-            background: rgba(34, 211, 238, 0.1);
-            border-left: 4px solid var(--primary);
-            padding: 15px;
-            margin: 20px 0;
-            font-style: italic;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            text-align: left;
-        }
-
-        .glow-btn {
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
-            transition: 0.3s;
-        }
-
-        .glow-btn:hover {
-            box-shadow: 0 0 40px rgba(34, 211, 238, 0.7);
-            transform: scale(1.02);
-        }
-
-        .stats-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .timer-bar-bg {
-            width: 100%;
-            height: 8px;
-            background: #334155;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        #timer-bar {
-            width: 100%;
-            height: 100%;
-            background: var(--primary);
-            transition: width 1s linear;
-        }
-
-        .category-tag {
-            background: var(--accent);
-            color: black;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            text-transform: uppercase;
-            font-weight: 800;
-        }
-
-        .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            background: #0f172a;
-            color: white;
-            cursor: pointer;
-            text-align: left;
-            font-size: 16px;
-            transition: 0.2s;
-        }
-
-        .option-btn:hover {
-            border-color: var(--primary);
-            background: #1e293b;
-        }
-
-        .option-btn.correct { background: #059669 !important; border-color: #34d399; }
-        .option-btn.wrong { background: #dc2626 !important; border-color: #f87171; }
-
-        .menu-btn {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 18px;
-            cursor: pointer;
-            background: linear-gradient(45deg, #0891b2, #22d3ee);
-            color: #0f172a;
-        }
-
-        #result-screen { text-align: center; }
-        .grade { font-size: 4rem; font-weight: 900; color: var(--accent); margin: 10px 0; }
-
-        footer { margin-top: auto; padding: 20px; opacity: 0.6; font-size: 12px; }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(5px); }
-            50% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-            100% { transform: translateX(0); }
-        }
-        .shake { animation: shake 0.3s; }
-
-        html, body {
-            height: 100%;
-            overscroll-behavior: none;
-        }
+        .glitch { position: relative; }
+        .glitch::before { content: "SCIENCE QUEST"; position: absolute; left: -2px; text-shadow: 2px 0 red; clip: rect(44px, 450px, 56px, 0); animation: glitch-1 5s infinite linear alternate-reverse; }
+        @keyframes glitch-1 { 0% { clip: rect(10px, 9999px, 9px, 0); } 100% { clip: rect(80px, 9999px, 30px, 0); } }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="margin:0">SCIENCE QUEST 🔬</h1>
-    <p style="margin:5px 0; color: var(--primary)">School Project Edition v4.0</p>
+    <div style="font-weight: 900; color: var(--primary); letter-spacing: 1px;">CORE <span style="color:white">V8.1</span></div>
+    <div id="top-score-nav" class="hud-stat" style="color: var(--accent);">🏆 <span id="top-val">0</span></div>
 </header>
 
-<div class="container" id="start-screen">
-    <div class="hero-icon">🔬</div>
-    <h2 class="pulse-text">Lab Access Granted</h2>
-    <p>Welcome, Lead Researchers <strong>Rehan & Naveen</strong>.</p>
-    
-    <div class="mission-box">
-        "Your joint mission is to analyze 60+ data points across the scientific spectrum. Accuracy and speed are mandatory for team success."
-    </div>
-
-    <button class="menu-btn glow-btn" onclick="startGamePrompt()">INITIALIZE ADVENTURE</button>
-    <button class="menu-btn" style="background: transparent; color: var(--primary); border: 1px solid var(--primary);" onclick="alert('Instructions: Answer before time runs out! You have 3 lives. Good luck, Scientists!')">VIEW PROTOCOLS</button>
+<div class="container" id="start-screen" style="display:block">
+    <div class="hero-box"><div class="hero-img">🧪</div></div>
+    <h1 class="glitch" style="margin:0; font-size: 2.5rem; font-weight: 900;">SCIENCE QUEST</h1>
+    <p style="color:#94a3b8; margin: 10px 0 35px 0; font-weight: bold; font-size: 0.8rem; letter-spacing: 2px;">REHAN & NAVEEN SPECIAL</p>
+    <button class="menu-btn" onclick="startWithSound()">START SYSTEM</button>
 </div>
 
-<div class="container" id="level-screen" style="display:none">
-    <h2 style="text-align:center">Select Difficulty</h2>
-    <button class="menu-btn" onclick="startGame('easy')">🟢 EASY (Basics)</button>
-    <button class="menu-btn" style="background:#f59e0b" onclick="startGame('medium')">🟡 MEDIUM (Junior)</button>
-    <button class="menu-btn" style="background:#ef4444" onclick="startGame('hard')">🔴 HARD (Expert)</button>
+<div class="container" id="level-screen">
+    <h2 style="margin-bottom:30px; color: var(--primary);">SELECT DATA LEVEL</h2>
+    <button class="menu-btn lvl-btn" onclick="startGame('easy')" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid var(--success);">🟢 ELEMENTARY (50+ Q)</button>
+    <button class="menu-btn lvl-btn" onclick="startGame('medium')" style="background: rgba(245, 158, 11, 0.1); color: var(--accent); border: 1px solid var(--accent);">🟡 PROFESSIONAL (50+ Q)</button>
+    <button class="menu-btn lvl-btn" onclick="startGame('hard')" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger);">🔴 QUANTUM (50+ Q)</button>
 </div>
 
-<div class="container" id="game-screen" style="display:none">
-    <div class="stats-header">
-        <span>❤️ Lives: <span id="lives">3</span></span>
-        <span class="category-tag" id="category">Science</span>
-        <span>⭐ Score: <span id="score">0</span></span>
-    </div>
-    
+<div class="container" id="game-screen">
     <div class="timer-bar-bg"><div id="timer-bar"></div></div>
-
-    <div class="question-text" id="question">Loading...</div>
-    
-    <div id="options-container"></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:25px;">
+        <div class="hud-stat" style="color:var(--danger);">HP: <span id="lives">3</span></div>
+        <div class="hud-stat" style="color:var(--primary);">XP: <span id="score">0</span></div>
+    </div>
+    <div style="min-height: 80px; display: flex; align-items: center; justify-content: center;">
+        <h3 id="question" style="margin:0; font-size: 1.3rem; line-height: 1.4; color: #e5e7eb;">Loading Question...</h3>
+    </div>
+    <div id="options-container" style="margin-top: 30px;"></div>
 </div>
 
-<div class="container" id="result-screen" style="display:none">
-    <h2>Mission Complete!</h2>
-    <div class="grade" id="final-grade">A</div>
-    <p id="final-stats">You scored 0 points</p>
-    <button class="menu-btn" onclick="location.reload()">PLAY AGAIN</button>
+<div class="container" id="result-screen">
+    <h2 style="color: var(--primary);">MISSION ENDED</h2>
+    <div id="final-score-display" style="font-size: 5rem; font-weight:900; color:var(--accent); text-shadow: 0 0 30px rgba(255,215,0,0.3);">0</div>
+    <p style="color:#94a3b8; font-weight: bold; margin-bottom: 30px;">TOTAL XP RECOVERED</p>
+    <div id="save-section" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 25px;">
+        <input type="text" id="player-name" placeholder="ENTER AGENT ID" maxlength="12" style="width: 80%; padding: 15px; background: transparent; border: none; border-bottom: 2px solid var(--primary); color: white; text-align: center; font-size: 1.1rem; outline: none; margin-bottom: 20px;">
+        <button class="menu-btn" onclick="saveAndShowLeaderboard()">UPDATE DATABASE</button>
+    </div>
+    <button class="menu-btn" style="background:#25D366; color:white; margin-top:20px;" onclick="shareToWhatsApp()">SHARE XP 📱</button>
+    <button class="menu-btn" style="background:none; border:1px solid #334155; color:white" onclick="location.reload()">RE-INITIATE</button>
 </div>
 
-<footer>Created by Rehan & Naveen • Science Fair Project 🚀</footer>
+<div class="container" id="leader-board-screen" style="display:block; margin-top: 0; background: transparent; box-shadow: none; border: none;">
+    <h3 style="color: var(--primary); text-align:center; font-size: 0.9rem; letter-spacing: 3px;">🏆 TOP AGENTS</h3>
+    <div id="leaderboard-content"></div>
+</div>
+
+<footer>&copy; 2026 REHAN & NAVEEN • ENCRYPTED</footer>
 
 <script>
+// --- SOFT LO-FI AUDIO ENGINE ---
 const AudioEngine = {
-    ctx: null,
-    init() {
-        if (!this.ctx) {
-            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-    },
-    // Increased Sound for buttons
-    playClick() {
-        this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(500, this.ctx.currentTime);
-        // Volume increased from 0.1 to 0.4
-        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.15);
-    },
-    playWrong() {
-        this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.6);
-        // Volume increased to 0.5 for wrong answer
-        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.6);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.6);
-    },
-    playBeat() {
-        this.init();
-        if (this.ctx.state === 'suspended') this.ctx.resume();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(60, this.ctx.currentTime);
-        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.5);
-    }
-};
+    ctx: null, isMusicPlaying: false,
+    init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+    playBGM() {
+        if (this.isMusicPlaying) return;
+        this.init(); this.isMusicPlaying = true;
+        
+        const playPad = (freq, time, duration, vol) => {
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            const filter = this.ctx.createBiquadFilter();
+            
+            osc.type = 'sine';
+            filter.type = 'lowpass';
+            filter.frequency.value = 400; // Muffled lo-fi feel
+            
+            osc.frequency.setValueAtTime(freq, time);
+            g.gain.setValueAtTime(0, time);
+            g.gain.linearRampToValueAtTime(vol, time + 1); // Slow fade in
+            g.gain.linearRampToValueAtTime(0, time + duration);
+            
+            osc.connect(filter);
+            filter.connect(g);
+            g.connect(this.ctx.destination);
+            
+            osc.start(time);
+            osc.stop(time + duration);
+        };
 
-setInterval(() => {
-    if(document.getElementById('game-screen').style.display === 'block') {
-        AudioEngine.playBeat();
-    }
-}, 1200);
+        let startTime = this.ctx.currentTime;
+        const loFiLoop = () => {
+            // Chords: Cmaj7 - Am7 - Fmaj7 - G
+            const chords = [
+                [261.63, 329.63, 392.00, 493.88], // Cmaj7
+                [220.00, 261.63, 329.63, 392.00], // Am7
+                [174.61, 220.00, 261.63, 349.23], // Fmaj7
+                [196.00, 246.94, 293.66, 392.00]  // G
+            ];
+            
+            chords.forEach((chord, i) => {
+                chord.forEach(note => {
+                    playPad(note, startTime + (i * 4), 4.2, 0.04);
+                });
+            });
+            
+            startTime += 16;
+            setTimeout(loFiLoop, 16000);
+        };
+        loFiLoop();
+    },
+    playClick() { this.init(); const osc = this.ctx.createOscillator(); const g = this.ctx.createGain(); osc.frequency.setValueAtTime(600, this.ctx.currentTime); g.gain.setValueAtTime(0.2, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1); osc.connect(g); g.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.1); },
+    playCorrect() { this.init(); const osc = this.ctx.createOscillator(); const g = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(523, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(659, this.ctx.currentTime + 0.2); g.gain.setValueAtTime(0.2, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3); osc.connect(g); g.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.3); },
+    playWrong() { this.init(); const osc = this.ctx.createOscillator(); const g = this.ctx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(110, this.ctx.currentTime); g.gain.setValueAtTime(0.2, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4); osc.connect(g); g.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.4); }
+};
 
 const questionBank = {
     easy: [
-        {q:"Which planet is the 'Red Planet'?", o:["Venus","Mars","Jupiter"], a:1, c:"Space"},
-        {q:"What gas do humans need to breathe?", o:["Oxygen","Nitrogen","CO2"], a:0, c:"Biology"},
-        {q:"How many legs does an ant have?", o:["4","6","8"], a:1, c:"Biology"},
-        {q:"H2O is the formula for?", o:["Air","Salt","Water"], a:2, c:"Chemistry"},
-        {q:"The center of an atom is called?", o:["Shell","Nucleus","Electron"], a:1, c:"Physics"},
-        {q:"Which star is closest to Earth?", o:["Sirius","Sun","Proxima Centauri"], a:1, c:"Space"},
-        {q:"Which force pulls things to the ground?", o:["Magnetism","Friction","Gravity"], a:2, c:"Physics"},
-        {q:"Baby frogs are called?", o:["Cubs","Tadpoles","Puppies"], a:1, c:"Biology"},
-        {q:"A thermometer measures?", o:["Weight","Length","Temperature"], a:2, c:"Physics"},
-        {q:"What do bees collect from flowers?", o:["Honey","Nectar","Water"], a:1, c:"Biology"},
-        {q:"How many colors are in a rainbow?", o:["7","6","8"], a:0, c:"Physics"},
-        {q:"Which organ pumps blood?", o:["Lungs","Brain","Heart"], a:2, c:"Biology"},
-        {q:"Ice is which state of matter?", o:["Liquid","Solid","Gas"], a:1, c:"Chemistry"},
-        {q:"The Moon is a...", o:["Planet","Star","Satellite"], a:2, c:"Space"},
-        {q:"Which animal is a mammal?", o:["Shark","Whale","Turtle"], a:1, c:"Biology"},
-        {q:"Plants make food using...", o:["Photosynthesis","Respiration","Digestion"], a:0, c:"Biology"},
-        {q:"What is the hardest natural substance?", o:["Gold","Iron","Diamond"], a:2, c:"Chemistry"},
-        {q:"Our galaxy is called?", o:["Andromeda","Milky Way","Orion"], a:1, c:"Space"},
-        {q:"Which metal is a liquid?", o:["Silver","Mercury","Copper"], a:1, c:"Chemistry"},
-        {q:"Light travels in...", o:["Circles","Waves/Lines","Squares"], a:1, c:"Physics"}
+        {q:"Which planet is the 'Red Planet'?", o:["Venus","Mars","Jupiter"], a:1},
+        {q:"What is the chemical formula for Water?", o:["Air","H2O","CO2"], a:1},
+        {q:"How many lungs does a human have?", o:["1","2","3"], a:1},
+        {q:"Which gas do plants absorb?", o:["Oxygen","Nitrogen","Carbon Dioxide"], a:2},
+        {q:"Force that keeps us on Earth?", o:["Magnetism","Friction","Gravity"], a:2},
+        {q:"Which animal is known as 'Ship of Desert'?", o:["Horse","Camel","Elephant"], a:1},
+        {q:"Baby frog is called?", o:["Caterpillar","Tadpole","Cub"], a:1},
+        {q:"Sun is a?", o:["Star","Planet","Satellite"], a:0},
+        {q:"How many days in a leap year?", o:["364","365","366"], a:2},
+        {q:"Boiling point of water?", o:["90C","100C","120C"], a:1},
+        {q:"Which planet has a ring?", o:["Mars","Saturn","Mercury"], a:1},
+        {q:"Smallest planet?", o:["Earth","Venus","Mercury"], a:2},
+        {q:"Human body temperature (Normal)?", o:["37C","45C","100C"], a:0},
+        {q:"What gives leaves green color?", o:["Water","Chlorophyll","Sunlight"], a:1},
+        {q:"Hardest natural substance?", o:["Gold","Diamond","Iron"], a:1},
+        {q:"Which gas is for breathing?", o:["CO2","Nitrogen","Oxygen"], a:2},
+        {q:"Rainbow has how many colors?", o:["5","7","9"], a:1},
+        {q:"The Moon is a?", o:["Planet","Satellite","Star"], a:1},
+        {q:"Who invented light bulb?", o:["Newton","Edison","Tesla"], a:1},
+        {q:"Ice is a solid form of?", o:["Milk","Juice","Water"], a:2},
+        {q:"Fastest land animal?", o:["Tiger","Cheetah","Lion"], a:1},
+        {q:"Shape of Earth?", o:["Flat","Sphere","Square"], a:1},
+        {q:"How many bones in adult human?", o:["106","206","306"], a:1},
+        {q:"Largest ocean?", o:["Atlantic","Indian","Pacific"], a:2},
+        {q:"Brain of computer?", o:["RAM","CPU","HDD"], a:1},
+        {q:"Which bird cannot fly?", o:["Sparrow","Ostrich","Eagle"], a:1},
+        {q:"Longest river?", o:["Ganga","Nile","Amazon"], a:1},
+        {q:"Current flows in?", o:["Wood","Copper","Rubber"], a:1},
+        {q:"Fish breathe through?", o:["Nose","Gills","Skin"], a:1},
+        {q:"Vitamin from Sun?", o:["Vit A","Vit C","Vit D"], a:2},
+        {q:"Largest planet?", o:["Saturn","Jupiter","Uranus"], a:1},
+        {q:"Water freezes at?", o:["0C","10C","-5C"], a:0},
+        {q:"Spiders have how many legs?", o:["6","8","10"], a:1},
+        {q:"Cow gives us?", o:["Egg","Wool","Milk"], a:2},
+        {q:"A magnet attracts?", o:["Plastic","Iron","Wood"], a:1},
+        {q:"Which planet is closest to Sun?", o:["Venus","Mars","Mercury"], a:2},
+        {q:"Earth has how many Moons?", o:["1","2","3"], a:0},
+        {q:"Sound travels fastest in?", o:["Air","Water","Steel"], a:2},
+        {q:"Gases around Earth called?", o:["Hydrosphere","Atmosphere","Biosphere"], a:1},
+        {q:"Human heart has how many chambers?", o:["2","3","4"], a:2},
+        {q:"Largest desert?", o:["Thar","Sahara","Gobi"], a:1},
+        {q:"Electric bulb filament is?", o:["Tungsten","Copper","Gold"], a:0},
+        {q:"Which is a mammal?", o:["Snake","Whale","Shark"], a:1},
+        {q:"How many senses in humans?", o:["4","5","6"], a:1},
+        {q:"White light has how many colors?", o:["3","7","1"], a:1},
+        {q:"What is H2O?", o:["Salt","Acid","Water"], a:2},
+        {q:"Capital of India?", o:["Mumbai","Delhi","Kolkata"], a:1},
+        {q:"Earth's twin planet?", o:["Mars","Venus","Mercury"], a:1},
+        {q:"We get energy from?", o:["Food","Sleep","Talking"], a:0},
+        {q:"Bees make?", o:["Silk","Honey","Milk"], a:1}
     ],
     medium: [
-        {q:"What is the boiling point of water?", o:["90°C","100°C","110°C"], a:1, c:"Physics"},
-        {q:"Which gas do plants absorb?", o:["Oxygen","Carbon Dioxide","Helium"], a:1, c:"Biology"},
-        {q:"Smallest unit of life?", o:["Atom","Cell","Tissue"], a:1, c:"Biology"},
-        {q:"Symbol for Gold?", o:["Ag","Go","Au"], a:2, c:"Chemistry"},
-        {q:"Who proposed the Theory of Evolution?", o:["Newton","Darwin","Einstein"], a:1, c:"Biology"},
-        {q:"Speed of light is approx?", o:["300,000 km/s","150,000 km/s","1 million km/s"], a:0, c:"Physics"},
-        {q:"Which planet has the most rings?", o:["Jupiter","Saturn","Uranus"], a:1, c:"Space"},
-        {q:"Main gas in Earth's atmosphere?", o:["Oxygen","Nitrogen","Argon"], a:1, c:"Chemistry"},
-        {q:"pH of 7 is...", o:["Acidic","Basic","Neutral"], a:2, c:"Chemistry"},
-        {q:"How many bones in an adult human?", o:["206","300","150"], a:0, c:"Biology"},
-        {q:"Sound travels fastest through?", o:["Air","Water","Steel"], a:2, c:"Physics"},
-        {q:"Which vitamin is from Sunlight?", o:["Vit B12","Vit C","Vit D"], a:2, c:"Biology"},
-        {q:"A group of lions is a?", o:["Pack","Pride","Herd"], a:1, c:"Biology"},
-        {q:"Which planet is the hottest?", o:["Mercury","Venus","Mars"], a:1, c:"Space"},
-        {q:"Chemical symbol for Iron?", o:["Ir","Fe","In"], a:1, c:"Chemistry"},
-        {q:"What is the powerhouse of the cell?", o:["Nucleus","Mitochondria","Ribosome"], a:1, c:"Biology"},
-        {q:"Dry ice is frozen...", o:["Water","Nitrogen","CO2"], a:2, c:"Chemistry"},
-        {q:"Which lens curves inward?", o:["Convex","Concave","Flat"], a:1, c:"Physics"},
-        {q:"Human blood is red due to?", o:["Plasma","Hemoglobin","Zinc"], a:1, c:"Biology"},
-        {q:"Largest planet in Solar System?", o:["Saturn","Neptune","Jupiter"], a:2, c:"Space"}
+        {q:"Powerhouse of the Cell?", o:["Nucleus","Mitochondria","Ribosome"], a:1},
+        {q:"Symbol for Gold?", o:["Ag","Go","Au"], a:2},
+        {q:"Closest star to Earth?", o:["Sirius","The Sun","Proxima Centauri"], a:1},
+        {q:"PH of pure water?", o:["5","7","9"], a:1},
+        {q:"Layer that protects from UV?", o:["Oxygen","Ozone","Carbon"], a:1},
+        {q:"Weight of an object is measured in?", o:["Kilogram","Newton","Joule"], a:1},
+        {q:"Which gas is 'Laughing Gas'?", o:["Nitrous Oxide","CO2","Methane"], a:0},
+        {q:"Sound cannot travel in?", o:["Water","Vacuum","Iron"], a:1},
+        {q:"Main gas in Sun?", o:["Oxygen","Helium","Hydrogen"], a:2},
+        {q:"Which organ filters blood?", o:["Heart","Liver","Kidney"], a:2},
+        {q:"Acid found in Lemons?", o:["Acetic","Citric","Hydrochloric"], a:1},
+        {q:"Velocity of light in vacuum?", o:["3x10^8 m/s","2x10^8 m/s","5x10^8 m/s"], a:0},
+        {q:"Father of Genetics?", o:["Darwin","Mendel","Einstein"], a:1},
+        {q:"SI unit of Resistance?", o:["Volt","Ampere","Ohm"], a:2},
+        {q:"Chemical name of Salt?", o:["NaCl","KCl","NaOH"], a:0},
+        {q:"Dry ice is?", o:["Solid Nitrogen","Solid CO2","Solid Water"], a:1},
+        {q:"Which metal is liquid at room temp?", o:["Sodium","Mercury","Silver"], a:1},
+        {q:"Study of fossils?", o:["Biology","Paleontology","Geology"], a:1},
+        {q:"Universal donor blood group?", o:["A+","AB+","O-"], a:2},
+        {q:"Light year is unit of?", o:["Time","Distance","Speed"], a:1},
+        {q:"Gas used in Soda water?", o:["Nitrogen","Oxygen","CO2"], a:2},
+        {q:"Hardest part of human body?", o:["Skull","Enamel","Femur"], a:1},
+        {q:"Gas responsible for Global Warming?", o:["Oxygen","Nitrogen","CO2"], a:2},
+        {q:"Instrument to measure wind?", o:["Barometer","Anemometer","Hygrometer"], a:1},
+        {q:"Chemical symbol of Iron?", o:["Ir","Fe","In"], a:1},
+        {q:"Who proposed Big Bang Theory?", o:["Lemaitre","Hubble","Newton"], a:0},
+        {q:"Process of plants making food?", o:["Respiration","Photosynthesis","Digestion"], a:1},
+        {q:"Smallest unit of life?", o:["Atom","Cell","Molecule"], a:1},
+        {q:"Inert gas used in lights?", o:["Neon","Chlorine","Fluorine"], a:0},
+        {q:"Main component of Natural Gas?", o:["Propane","Butane","Methane"], a:2},
+        {q:"Disease caused by Iron deficiency?", o:["Scurvy","Anemia","Rickets"], a:1},
+        {q:"Number of teeth in adult?", o:["28","30","32"], a:2},
+        {q:"Acid in human stomach?", o:["HCl","H2SO4","HNO3"], a:0},
+        {q:"Newton's 1st law is also called?", o:["Inertia","Momentum","Gravity"], a:0},
+        {q:"Galvanization uses which metal?", o:["Lead","Zinc","Chrome"], a:1},
+        {q:"Bronze is alloy of Copper and?", o:["Zinc","Nickel","Tin"], a:2},
+        {q:"Isotopes have same number of?", o:["Neutrons","Protons","Electrons"], a:1},
+        {q:"Which gas is used for fire fighting?", o:["Oxygen","CO2","Hydrogen"], a:1},
+        {q:"Normal BP of humans?", o:["120/80","140/90","100/60"], a:0},
+        {q:"Atomic number of Carbon?", o:["4","6","8"], a:1},
+        {q:"Unit of Power?", o:["Joule","Watt","Newton"], a:1},
+        {q:"Brass is alloy of Copper and?", o:["Tin","Lead","Zinc"], a:2},
+        {q:"Smallest bone in body?", o:["Femur","Stapes","Humerus"], a:1},
+        {q:"Full form of DNA?", o:["Deoxyribo Nucleic Acid","Digital Network","Data Node"], a:0},
+        {q:"Percentage of Oxygen in air?", o:["78%","21%","1%"], a:1},
+        {q:"Diamond is allotrope of?", o:["Iron","Gold","Carbon"], a:2},
+        {q:"Study of universe?", o:["Cosmology","Astrology","Sociology"], a:0},
+        {q:"Main source of Vitamin C?", o:["Apple","Milk","Orange"], a:2},
+        {q:"Unit of electric current?", o:["Volt","Watt","Ampere"], a:2},
+        {q:"Which part of eye is donated?", o:["Lens","Cornea","Retina"], a:1}
     ],
     hard: [
-        {q:"Symbol for Sodium?", o:["S","So","Na"], a:2, c:"Chemistry"},
-        {q:"Absolute Zero in Celsius?", o:["-273.15°C","0°C","-100°C"], a:0, c:"Physics"},
-        {q:"Which is not a noble gas?", o:["Neon","Helium","Nitrogen"], a:2, c:"Chemistry"},
-        {q:"E=mc² - what is 'c'?", o:["Gravity","Speed of Light","Energy"], a:1, c:"Physics"},
-        {q:"Which planet spins sideways?", o:["Uranus","Neptune","Saturn"], a:0, c:"Space"},
-        {q:"A light-year measures?", o:["Time","Distance","Speed"], a:1, c:"Space"},
-        {q:"What is the atomic number of Oxygen?", o:["6","8","10"], a:1, c:"Chemistry"},
-        {q:"Who discovered Penicillin?", o:["Fleming","Pasteur","Curie"], a:0, c:"Biology"},
-        {q:"Unit of Electric Resistance?", o:["Volt","Ampere","Ohm"], a:2, c:"Physics"},
-        {q:"Most abundant element in Universe?", o:["Oxygen","Hydrogen","Carbon"], a:1, c:"Space"},
-        {q:"Study of fungi is?", o:["Mycology","Botany","Zoology"], a:0, c:"Biology"},
-        {q:"Radioactivity was discovered by?", o:["Einstein","Henri Becquerel","Tesla"], a:1, c:"Physics"},
-        {q:"What is the 'D' in DNA?", o:["Dioxy","Deoxyribo","Dual"], a:1, c:"Biology"},
-        {q:"First human in space?", o:["Armstrong","Gagarin","Aldrin"], a:1, c:"Space"},
-        {q:"What charge does a neutron have?", o:["Positive","Negative","Neutral"], a:2, c:"Physics"},
-        {q:"Strongest acid on pH scale is?", o:["0","7","14"], a:0, c:"Chemistry"},
-        {q:"Valency of Carbon?", o:["2","4","6"], a:1, c:"Chemistry"},
-        {q:"Which part of brain controls balance?", o:["Cerebrum","Cerebellum","Medulla"], a:1, c:"Biology"},
-        {q:"Lightest metal?", o:["Lithium","Sodium","Aluminum"], a:0, c:"Chemistry"},
-        {q:"Distance from Earth to Sun?", o:["93 mil miles","10 mil miles","1 bil miles"], a:0, c:"Space"}
+        {q:"Absolute Zero in Celsius?", o:["-273.15C","0C","-100C"], a:0},
+        {q:"Theory of Relativity?", o:["Newton","Einstein","Tesla"], a:1},
+        {q:"Valency of Carbon?", o:["2","4","6"], a:1},
+        {q:"Lightest element in Universe?", o:["Helium","Hydrogen","Lithium"], a:1},
+        {q:"Speed of light approx?", o:["300k km/s","150k km/s","500k km/s"], a:0},
+        {q:"Constant for Gravity (g)?", o:["9.8 m/s2","8.9 m/s2","10.5 m/s2"], a:0},
+        {q:"First human in space?", o:["Armstrong","Yuri Gagarin","Elon Musk"], a:1},
+        {q:"Weakest force in nature?", o:["Gravity","Nuclear","Magnetic"], a:0},
+        {q:"Radioactivity was discovered by?", o:["Curie","Becquerel","Rutherford"], a:1},
+        {q:"Noble gas used in cancer treatment?", o:["Argon","Radon","Xenon"], a:1},
+        {q:"Who invented Penicillin?", o:["Fleming","Pasteur","Salk"], a:0},
+        {q:"Unit of magnetic flux?", o:["Weber","Tesla","Gauss"], a:0},
+        {q:"Escape velocity from Earth?", o:["9 km/s","11.2 km/s","15 km/s"], a:1},
+        {q:"Father of Quantum Mechanics?", o:["Planck","Bohr","Schrodinger"], a:0},
+        {q:"Human chromosome count?", o:["23","44","46"], a:2},
+        {q:"Density of water is max at?", o:["0C","4C","100C"], a:1},
+        {q:"Main ore of Aluminum?", o:["Hematite","Bauxite","Magnetite"], a:1},
+        {q:"Study of fungi?", o:["Botany","Mycology","Zoology"], a:1},
+        {q:"Most abundant metal in Earth's crust?", o:["Iron","Aluminum","Calcium"], a:1},
+        {q:"Atomic number of Uranium?", o:["90","92","235"], a:1},
+        {q:"Time taken by sunlight to reach Earth?", o:["5 min","8 min 20s","12 min"], a:1},
+        {q:"Who discovered Electron?", o:["Thomson","Chadwick","Bohr"], a:0},
+        {q:"Heaviest naturally occurring element?", o:["Gold","Lead","Uranium"], a:2},
+        {q:"Process of conversion of gas to solid?", o:["Deposition","Sublimation","Fusion"], a:0},
+        {q:"First artificial satellite?", o:["Sputnik 1","Apollo 11","Vostok 1"], a:0},
+        {q:"Symbol for Tungsten?", o:["Tu","W","Tg"], a:1},
+        {q:"pH of human blood?", o:["6.4","7.4","8.4"], a:1},
+        {q:"Most electronegative element?", o:["Oxygen","Fluorine","Chlorine"], a:1},
+        {q:"Who gave laws of planetary motion?", o:["Galileo","Kepler","Newton"], a:1},
+        {q:"Value of Avogadro's number?", o:["6.02x10^23","6.02x10^22","3.14x10^23"], a:0},
+        {q:"Element with highest melting point?", o:["Iron","Osmium","Tungsten"], a:2},
+        {q:"Who discovered Nucleus?", o:["Bohr","Rutherford","Dalton"], a:1},
+        {q:"Which subatomic particle is neutral?", o:["Proton","Electron","Neutron"], a:2},
+        {q:"Largest gland in body?", o:["Brain","Liver","Thyroid"], a:1},
+        {q:"Hertz is unit of?", o:["Pressure","Frequency","Energy"], a:1},
+        {q:"Ohm's Law formula?", o:["V=IR","P=VI","F=MA"], a:0},
+        {q:"Who discovered Blood Circulation?", o:["Harvey","Landsteiner","Darwin"], a:0},
+        {q:"Mirror used in car headlamps?", o:["Convex","Concave","Plane"], a:1},
+        {q:"Lightest metal?", o:["Lithium","Sodium","Magnesium"], a:0},
+        {q:"SI unit of Luminous Intensity?", o:["Lumen","Lux","Candela"], a:2},
+        {q:"Who gave Uncertainty Principle?", o:["Heisenberg","Einstein","Dirac"], a:0},
+        {q:"Main component of LPG?", o:["Methane","Butane","Ethane"], a:1},
+        {q:"Which acid is in Ants?", o:["Citric","Formic","Lactic"], a:1},
+        {q:"Sun's energy source?", o:["Fission","Fusion","Burning"], a:1},
+        {q:"Pascal is unit of?", o:["Force","Work","Pressure"], a:2},
+        {q:"Who invented Periodic Table?", o:["Mendeleev","Newton","Boyle"], a:0},
+        {q:"Sound above 20kHz is called?", o:["Infrasonic","Ultrasonic","Sonic"], a:1},
+        {q:"Vitamin helping blood clot?", o:["Vit C","Vit K","Vit E"], a:1},
+        {q:"Atomic mass of Oxygen?", o:["8","16","32"], a:1},
+        {q:"Distance between Earth & Sun?", o:["150m km","200m km","100m km"], a:0}
     ]
 };
 
-let currentQuestions = [];
-let qIndex = 0;
-let score = 0;
-let lives = 3;
-let timer;
-let timeLeft = 10;
+let score = 0, lives = 3, qIndex = 0, timer, timeLeft = 10, currentQuestions = [];
 
-function showScreen(id) {
-    document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-}
-
-function startGamePrompt() {
-    AudioEngine.init();
-    AudioEngine.playClick();
-    showScreen('level-screen');
-}
-
-function startGame(level) {
-    AudioEngine.playClick();
-    currentQuestions = [...questionBank[level]].sort(() => Math.random() - 0.5);
-    qIndex = 0;
-    score = 0;
-    lives = 3;
-    showScreen('game-screen');
-    loadQuestion();
-}
+function startWithSound() { AudioEngine.playClick(); AudioEngine.playBGM(); showScreen('level-screen'); }
+function showScreen(id) { document.querySelectorAll('.container').forEach(c => { if(c.id !== 'leader-board-screen') c.style.display = 'none'; }); document.getElementById(id).style.display = 'block'; }
+function startGame(lvl) { AudioEngine.playClick(); currentQuestions = [...questionBank[lvl]].sort(() => Math.random() - 0.5); score = 0; lives = 3; qIndex = 0; showScreen('game-screen'); loadQuestion(); }
 
 function loadQuestion() {
-    if (qIndex >= currentQuestions.length || lives <= 0) return finishGame();
-    timeLeft = 10;
-    const qData = currentQuestions[qIndex];
-    document.getElementById('question').innerText = qData.q;
-    document.getElementById('category').innerText = qData.c;
-    document.getElementById('score').innerText = score;
-    document.getElementById('lives').innerText = lives;
-    const container = document.getElementById('options-container');
-    container.innerHTML = '';
-    qData.o.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.innerText = opt;
-        btn.onclick = () => {
-            checkAnswer(i);
-        };
-        container.appendChild(btn);
-    });
-    startTimer();
+    if (qIndex >= currentQuestions.length || lives <= 0) return finish();
+    timeLeft = 10; const bar = document.getElementById('timer-bar'); bar.style.transition = 'none'; bar.style.width = '100%';
+    setTimeout(() => { bar.style.transition = 'width 10s linear'; bar.style.width = '0%'; }, 50);
+    clearInterval(timer); timer = setInterval(() => { timeLeft--; if (timeLeft <= 0) { AudioEngine.playWrong(); handleWrong(); } }, 1000);
+    const q = currentQuestions[qIndex]; document.getElementById('question').innerText = q.q; document.getElementById('score').innerText = score; document.getElementById('lives').innerText = lives;
+    const container = document.getElementById('options-container'); container.innerHTML = '';
+    q.o.forEach((opt, i) => { const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt; btn.onclick = () => check(i, btn); container.appendChild(btn); });
 }
 
-function startTimer() {
-    clearInterval(timer);
-    const bar = document.getElementById('timer-bar');
-    bar.style.width = '100%';
-    timer = setInterval(() => {
-        timeLeft--;
-        bar.style.width = (timeLeft * 10) + '%';
-        if (timeLeft <= 0) handleWrong();
-    }, 1000);
+function check(idx, btn) {
+    clearInterval(timer); const correct = currentQuestions[qIndex].a;
+    if (idx === correct) { AudioEngine.playCorrect(); btn.classList.add('correct'); score += 10 + timeLeft; setTimeout(() => { qIndex++; loadQuestion(); }, 600); }
+    else { AudioEngine.playWrong(); btn.classList.add('wrong'); document.querySelectorAll('.option-btn')[correct].classList.add('correct'); handleWrong(); }
 }
 
-function checkAnswer(selected) {
-    clearInterval(timer);
-    const correct = currentQuestions[qIndex].a;
-    const buttons = document.querySelectorAll('.option-btn');
-    if (selected === correct) {
-        AudioEngine.playClick();
-        score += 10;
-        buttons[selected].classList.add('correct');
-        setTimeout(nextQ, 600);
-    } else {
-        AudioEngine.playWrong();
-        buttons[selected].classList.add('wrong');
-        buttons[correct].classList.add('correct');
-        handleWrong();
-    }
+function handleWrong() { lives--; if (lives <= 0) setTimeout(finish, 1000); else setTimeout(() => { qIndex++; loadQuestion(); }, 1000); }
+function finish() { clearInterval(timer); showScreen('result-screen'); document.getElementById('final-score-display').innerText = score; }
+
+function saveAndShowLeaderboard() {
+    const name = document.getElementById('player-name').value.trim(); if (!name) return alert("Agent ID Req!");
+    let lb = JSON.parse(localStorage.getItem('sq_leaderboard')) || [];
+    lb.push({ name, score }); lb.sort((a, b) => b.score - a.score); lb = lb.slice(0, 5);
+    localStorage.setItem('sq_leaderboard', JSON.stringify(lb));
+    document.getElementById('save-section').innerHTML = "<h3 style='color:var(--success)'>XP RECORDED</h3>"; renderLeaderboard();
 }
 
-function handleWrong() {
-    lives--;
-    document.getElementById('game-screen').classList.add('shake');
-    setTimeout(() => document.getElementById('game-screen').classList.remove('shake'), 300);
-    if (lives <= 0) setTimeout(finishGame, 1000);
-    else setTimeout(nextQ, 1000);
+function renderLeaderboard() {
+    const lb = JSON.parse(localStorage.getItem('sq_leaderboard')) || [];
+    const container = document.getElementById('leaderboard-content');
+    container.innerHTML = lb.map((e, i) => `<div class="lb-row ${i === 0 ? 'rank-1' : ''}"><span>#${i+1} ${e.name}</span><span>${e.score} XP</span></div>`).join('');
+    if(lb[0]) document.getElementById('top-val').innerText = lb[0].score;
 }
 
-function nextQ() {
-    qIndex++;
-    loadQuestion();
-}
-
-function finishGame() {
-    clearInterval(timer);
-    showScreen('result-screen');
-    let grade = 'C';
-    if (score >= 150) grade = 'A+';
-    else if (score >= 100) grade = 'A';
-    else if (score >= 60) grade = 'B';
-    document.getElementById('final-grade').innerText = grade;
-    document.getElementById('final-stats').innerText = `Final Score: ${score} points | Difficulty: Completed`;
-}
-
-document.addEventListener('click', (e) => {
-    if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('option-btn')) {
-        AudioEngine.playClick();
-    }
-});
+function shareToWhatsApp() { const msg = `I scored ${score} XP in Science Quest! Beat me? 🔬`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`); }
+window.onload = renderLeaderboard;
 </script>
-
 </body>
 </html>
