@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Quest Pro - Rehan & Naveen & Ahmad raza</title>
+    <title>Science Quest Pro - Rehan, Naveen & Ahmad Raza</title>
     <style>
         :root { 
             --primary: #00f2ff; --accent: #ffd700; --danger: #ff4d4d; 
@@ -89,7 +89,7 @@
         }
         .rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); border: 1px solid var(--accent); }
 
-        footer { margin-top: auto; padding: 30px; font-size: 0.8rem; color: #4b5563; text-transform: uppercase; letter-spacing: 3px; }
+        footer { margin-top: auto; padding: 30px; font-size: 0.8rem; color: #4b5563; text-transform: uppercase; letter-spacing: 3px; text-align: center;}
 
         .glitch { position: relative; }
         .glitch::before { content: "SCIENCE QUEST"; position: absolute; left: -2px; text-shadow: 2px 0 red; clip: rect(44px, 450px, 56px, 0); animation: glitch-1 5s infinite linear alternate-reverse; }
@@ -99,14 +99,14 @@
 <body>
 
 <header>
-    <div style="font-weight: 900; color: var(--primary); letter-spacing: 1px;">CORE <span style="color:white">V8.1</span></div>
+    <div style="font-weight: 900; color: var(--primary); letter-spacing: 1px;">CORE <span style="color:white">V8.2</span></div>
     <div id="top-score-nav" class="hud-stat" style="color: var(--accent);">🏆 <span id="top-val">0</span></div>
 </header>
 
 <div class="container" id="start-screen" style="display:block">
     <div class="hero-box"><div class="hero-img">🧪</div></div>
     <h1 class="glitch" style="margin:0; font-size: 2.5rem; font-weight: 900;">SCIENCE QUEST</h1>
-    <p style="color:#94a3b8; margin: 10px 0 35px 0; font-weight: bold; font-size: 0.8rem; letter-spacing: 2px;">REHAN & NAVEEN SPECIAL</p>
+    <p style="color:#94a3b8; margin: 10px 0 35px 0; font-weight: bold; font-size: 0.75rem; letter-spacing: 1.5px;">REHAN • NAVEEN • AHMAD RAZA</p>
     <button class="menu-btn" onclick="startWithSound()">START SYSTEM</button>
 </div>
 
@@ -146,57 +146,29 @@
     <div id="leaderboard-content"></div>
 </div>
 
-<footer>&copy; 2026 REHAN & NAVEEN • ENCRYPTED</footer>
+<footer>&copy; 2026 REHAN • NAVEEN • AHMAD RAZA • ENCRYPTED</footer>
 
 <script>
-// --- SOFT LO-FI AUDIO ENGINE ---
+// --- AUDIO ENGINE & QUESTION BANK (SAB KUCH SAME HAI BAS NAAM UPDATE KIYA HAI) ---
 const AudioEngine = {
     ctx: null, isMusicPlaying: false,
     init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
     playBGM() {
         if (this.isMusicPlaying) return;
         this.init(); this.isMusicPlaying = true;
-        
         const playPad = (freq, time, duration, vol) => {
-            const osc = this.ctx.createOscillator();
-            const g = this.ctx.createGain();
-            const filter = this.ctx.createBiquadFilter();
-            
-            osc.type = 'sine';
-            filter.type = 'lowpass';
-            filter.frequency.value = 400; // Muffled lo-fi feel
-            
-            osc.frequency.setValueAtTime(freq, time);
-            g.gain.setValueAtTime(0, time);
-            g.gain.linearRampToValueAtTime(vol, time + 1); // Slow fade in
-            g.gain.linearRampToValueAtTime(0, time + duration);
-            
-            osc.connect(filter);
-            filter.connect(g);
-            g.connect(this.ctx.destination);
-            
-            osc.start(time);
-            osc.stop(time + duration);
+            const osc = this.ctx.createOscillator(); const g = this.ctx.createGain(); const filter = this.ctx.createBiquadFilter();
+            osc.type = 'sine'; filter.type = 'lowpass'; filter.frequency.value = 400;
+            osc.frequency.setValueAtTime(freq, time); g.gain.setValueAtTime(0, time);
+            g.gain.linearRampToValueAtTime(vol, time + 1); g.gain.linearRampToValueAtTime(0, time + duration);
+            osc.connect(filter); filter.connect(g); g.connect(this.ctx.destination);
+            osc.start(time); osc.stop(time + duration);
         };
-
         let startTime = this.ctx.currentTime;
         const loFiLoop = () => {
-            // Chords: Cmaj7 - Am7 - Fmaj7 - G
-            const chords = [
-                [261.63, 329.63, 392.00, 493.88], // Cmaj7
-                [220.00, 261.63, 329.63, 392.00], // Am7
-                [174.61, 220.00, 261.63, 349.23], // Fmaj7
-                [196.00, 246.94, 293.66, 392.00]  // G
-            ];
-            
-            chords.forEach((chord, i) => {
-                chord.forEach(note => {
-                    playPad(note, startTime + (i * 4), 4.2, 0.04);
-                });
-            });
-            
-            startTime += 16;
-            setTimeout(loFiLoop, 16000);
+            const chords = [[261.63, 329.63, 392.00, 493.88], [220.00, 261.63, 329.63, 392.00], [174.61, 220.00, 261.63, 349.23], [196.00, 246.94, 293.66, 392.00]];
+            chords.forEach((chord, i) => { chord.forEach(note => { playPad(note, startTime + (i * 4), 4.2, 0.04); }); });
+            startTime += 16; setTimeout(loFiLoop, 16000);
         };
         loFiLoop();
     },
@@ -404,7 +376,7 @@ function renderLeaderboard() {
     if(lb[0]) document.getElementById('top-val').innerText = lb[0].score;
 }
 
-function shareToWhatsApp() { const msg = `I scored ${score} XP in Science Quest! Beat me? 🔬`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`); }
+function shareToWhatsApp() { const msg = `I scored ${score} XP in Science Quest! Developed by Rehan, Naveen & Ahmad Raza. Beat me? 🔬`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`); }
 window.onload = renderLeaderboard;
 </script>
 </body>
