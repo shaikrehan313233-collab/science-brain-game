@@ -82,10 +82,21 @@
 
         @keyframes rare-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 60% { transform: translateX(8px); } }
 
+        /* NEW SCROLLABLE LEADERBOARD CSS */
+        #leaderboard-content {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-top: 15px;
+        }
+        #leaderboard-content::-webkit-scrollbar { width: 4px; }
+        #leaderboard-content::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
         .lb-row { 
             display: flex; justify-content: space-between; padding: 15px 20px; 
-            margin: 10px 0; border-radius: 20px; background: rgba(255,255,255,0.03);
+            margin: 8px 0; border-radius: 20px; background: rgba(255,255,255,0.03);
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
         }
         .rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); border: 1px solid var(--accent); }
 
@@ -142,14 +153,13 @@
 </div>
 
 <div class="container" id="leader-board-screen" style="display:block; margin-top: 0; background: transparent; box-shadow: none; border: none;">
-    <h3 style="color: var(--primary); text-align:center; font-size: 0.9rem; letter-spacing: 3px;">🏆 TOP AGENTS</h3>
+    <h3 style="color: var(--primary); text-align:center; font-size: 0.9rem; letter-spacing: 3px;">🏆 TOP AGENTS (TOP 50)</h3>
     <div id="leaderboard-content"></div>
 </div>
 
 <footer>&copy; 2026 REHAN • NAVEEN • AHMAD RAZA • ENCRYPTED</footer>
 
 <script>
-// --- AUDIO ENGINE & QUESTION BANK (SAB KUCH SAME HAI BAS NAAM UPDATE KIYA HAI) ---
 const AudioEngine = {
     ctx: null, isMusicPlaying: false,
     init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
@@ -361,10 +371,13 @@ function check(idx, btn) {
 function handleWrong() { lives--; if (lives <= 0) setTimeout(finish, 1000); else setTimeout(() => { qIndex++; loadQuestion(); }, 1000); }
 function finish() { clearInterval(timer); showScreen('result-screen'); document.getElementById('final-score-display').innerText = score; }
 
+// UPDATED FOR 50 MEMBERS
 function saveAndShowLeaderboard() {
     const name = document.getElementById('player-name').value.trim(); if (!name) return alert("Agent ID Req!");
     let lb = JSON.parse(localStorage.getItem('sq_leaderboard')) || [];
-    lb.push({ name, score }); lb.sort((a, b) => b.score - a.score); lb = lb.slice(0, 5);
+    lb.push({ name, score }); 
+    lb.sort((a, b) => b.score - a.score); 
+    lb = lb.slice(0, 50); // LIMIT INCREASED TO 50
     localStorage.setItem('sq_leaderboard', JSON.stringify(lb));
     document.getElementById('save-section').innerHTML = "<h3 style='color:var(--success)'>XP RECORDED</h3>"; renderLeaderboard();
 }
